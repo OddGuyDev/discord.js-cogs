@@ -3,7 +3,7 @@
     "/discord.js"
   ],
   "name": "discord.js-cogs",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "description": "Adding to discord.js some command functionality and framework.",
   "main": "main.js",
   "scripts": {
