@@ -119,8 +119,7 @@ class Cog {
           options: this.options,
           disabled: this.disabled ? false : true,
           commands: this.commamds,
-          totalCommands: this.totalCommands,
-          path = this._path
+          totalCommands: this.totalCommands
       };
       newCog = new require('./Cog.js')(this.path, this.name, newOptions, this.client);
       this.client.reloadCog(newCog.name, newCog);
