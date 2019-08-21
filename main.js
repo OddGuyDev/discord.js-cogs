@@ -8,5 +8,5 @@
 
 module.exports = {
 	Client: require('./src/Client.js'),
-	Cog: require('./src/Cog.js');
+	Cog: require('./src/Cog.js')
 }
