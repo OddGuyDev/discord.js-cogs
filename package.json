@@ -1,0 +1,27 @@
+{
+  "_requires": [
+    "/discord.js"
+  ],
+  "name": "discord.js-cogs",
+  "version": "0.0.1",
+  "description": "Adding to discord.js some command functionality and framework.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "discord.js",
+    "cogs",
+    "framework"
+  ],
+  "author": "LoeDoesCode",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShibeKinder/discord.js-cogs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ShibeKinder/discord.js-cogs/issues"
+  },
+  "homepage": "https://github.com/ShibeKinder/discord.js-cogs#readme"
+}
