@@ -86,14 +86,28 @@ class Client extends EventEmitter {
   }
   
   // PUT ON PRIVATE FOR "BEING UTTERLY USELESS"
-  /**
-   * Cogs loaded in Client
-   * @returns {?Cogs[]}
-   * @private
-   */
+ /**
+  * Cogs loaded in Client
+  * @returns {?Cogs[]}
+  * @private
+  */
   get getCogs() {
    	return this.cogs;
    }
+   
+ /**
+  * Runs a command for a Cog
+  * @param {String} command name
+  * @param {Object} arguments
+  * @returns {Promise<Object>}
+  */
+  runCommand(name, args) {
+      let cog = this.cogs.filter(cog => c.commandNames.include(name))[0];
+      return new Promise(function (fulfill, reject) {
+          if (cog == undefined || cog == null || cog == []) return reject(Error("Command not found in Cogs"));
+          return fulfill(cog.commands[name](args));
+      });
+  }
    
   /**
    * Gets a cog
