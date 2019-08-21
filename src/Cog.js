@@ -23,7 +23,6 @@ class Client {
    * @param {ClientOptions} [options] Options for the client
    */
   constructor(path, name, options = {}, cogClient) {
-    super();
     
     let data = require("../../" + path);
     /**
