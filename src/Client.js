@@ -135,8 +135,9 @@ class Client extends EventEmitter {
   */
   addCog(name, options) {
       if (fs.existsSync(this.commandDir + "/" + name + ".js")) {
-          if (options) let nc = new Cog(this.commandDir + "/" + name + ".js", name, options, this);
-          if (!options) let nc = new Cog(this.commandDir + "/" + name + ".js", name, {}, this);
+          let nc;
+          if (options) nc = new Cog(this.commandDir + "/" + name + ".js", name, options, this);
+          if (!options) nc = new Cog(this.commandDir + "/" + name + ".js", name, {}, this);
           this.cogs.push(nc);
           return nc;
       } else {
