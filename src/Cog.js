@@ -7,7 +7,6 @@
 'use-strict';
 
 const fs = require('fs');
-const Util = require('./Util.js');
 // PLACEHOLDER FOR VARIABLES
 let data, newCog, names, newOptions;
 
