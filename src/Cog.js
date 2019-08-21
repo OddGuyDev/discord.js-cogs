@@ -8,15 +8,18 @@
 
 const fs = require('fs');
 const Util = require('./Util.js');
+// PLACEHOLDER FOR VARIABLES
+let data, newCog, names, newOptions;
 
 /**
  * Class representing a Cog.
  */
-class Client {
+class Cog {
   /**
-   * Create a new `CogClient`.
+   * Create a new `Cog`.
    *
-   * @param {String} path to cog file
+   * @param {String} path to Cog file
+   * @param {String} name of Cog
    * @param {Object} options Client options
    */
    /**
@@ -24,15 +27,15 @@ class Client {
    */
   constructor(path, name, options = {}, cogClient) {
     
-    let data = require("../../" + path);
+    data = require("../../" + path);
     /**
-     * Name of the cog
+     * Name of the Cog
      * @type {String}
      * @readonly
      */
     this.name = name;
     /**
-     * Options loaded for the cog
+     * Options loaded for the Cog
      * @type {Object}
      * @readonly
      */
@@ -55,7 +58,7 @@ class Client {
      */
     this.totalCommands = data.length;
     /**
-     * Path for the cog
+     * Path for the Cog
      * @type {String}
      * @private
      * @readonly
@@ -64,7 +67,7 @@ class Client {
      
      if (options.disabled) this.disabled = false;
      
-     let names = [];
+     names = [];
      JSON.parse(data.toString()).forEach(f => {
          names.push(f.name);
      });
@@ -87,19 +90,19 @@ class Client {
    * Reloads the Cog
    * @returns {Cog}
    * @example
-   * //Reload the cog
+   * //Reload the Cog
    * Cog.reloadCog();
    */
   reloadCog() {
       delete require.cache[require.resolve('././' + this.path)];
-      let data = require('././' + this.path);
-      let newCog = new require('./Cog.js')(this.path, this.name, this.options);
-      let names = [];
+      data = require('././' + this.path);
+      newCog = new require('./Cog.js')(this.path, this.name, this.options);
+      names = [];
       JSON.parse(data.toString()).forEach(f => {
           names.push(f.name);
       });
       this.commandNames = names;
-      let data = require("../../" + path);
+      data = require("../../" + path);
       this.commands = data;
       this.totalCommands = data.length;
       this.client.reloadCog(newCog.name, newCog)
@@ -107,17 +110,17 @@ class Client {
   }
   
   /**
-   * Disable the cog
+   * Disable the Cog
    * @returns {Cog}
    */
   disableCog() {
-      let newOptions = {
+      newOptions = {
           name: this.name,
           options: this.options,
           disabled: this.disabled ? false : true,
           commands: this.commamds,
           totalCommands: this.totalCommands,
-      let newCog = new require('./Cog.js')(this.path, this.name, newOptions);
+      newCog = new require('./Cog.js')(this.path, this.name, newOptions);
       this = newCog;
       this.client.reloadCog(newCog.name, newCog)
       return newCog;
@@ -126,20 +129,4 @@ class Client {
       
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+module.export = Cog;
