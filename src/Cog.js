@@ -96,7 +96,7 @@ class Cog {
   reloadCog() {
       delete require.cache[require.resolve('././' + this.path)];
       data = require('././' + this.path);
-      newCog = new require('discord.js-cogs').Cog(this.path, this.name, this.options);
+      newCog = new require('./Cog.js')(this.path, this.name, this.options);
       names = [];
       JSON.parse(data.toString()).forEach(f => {
           names.push(f.name);
@@ -105,7 +105,7 @@ class Cog {
       data = require("../../" + path);
       this.commands = data;
       this.totalCommands = data.length;
-      this.client.reloadCog(newCog.name, newCog)
+      this.client.reloadCog(newCog.name, newCog);
       return newCog;
   }
   
@@ -120,9 +120,10 @@ class Cog {
           disabled: this.disabled ? false : true,
           commands: this.commamds,
           totalCommands: this.totalCommands,
-      newCog = new require('discord.js-cogs').Cog(this.path, this.name, newOptions);
-      this = newCog;
-      this.client.reloadCog(newCog.name, newCog)
+          path = this._path
+      };
+      newCog = new require('./Cog.js')(this.path, this.name, newOptions, this.client);
+      this.client.reloadCog(newCog.name, newCog);
       return newCog;
       
   }
