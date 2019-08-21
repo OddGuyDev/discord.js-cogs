@@ -94,7 +94,14 @@ class Client {
       delete require.cache[require.resolve('././' + this.path)];
       let data = require('././' + this.path);
       let newCog = new require('./Cog.js')(this.path, this.name, this.options);
-      this = newCog;
+      let names = [];
+      JSON.parse(data.toString()).forEach(f => {
+          names.push(f.name);
+      });
+      this.commandNames = names;
+      let data = require("../../" + path);
+      this.commands = data;
+      this.totalCommands = data.length;
       this.client.reloadCog(newCog.name, newCog)
       return newCog;
   }
