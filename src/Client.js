@@ -8,7 +8,6 @@
 
 const fs = require('fs');
 const EventEmitter = require('events'); 
-const { addEventListener, removeEventListener } = require('./EventListener.js');
 const Cog = require("./Cog.js");
 
 /**
@@ -29,177 +28,98 @@ class Client extends EventEmitter {
   constructor(client, options = {}) {
     super();
     
-    /**
-     * A Discord.JS Client
-     * @type {Object}
-     */
-    this.client = client;
-    /**
-     * Options loaded for the Cogs Client
-     * @type {?Object}
-     */
-    this.options = options;
-    /**
-     * Custom prefix for the Client
-     * @type {?String}
-     */
-    this.prefix = options.prefix;
-    
+   /**
+    * All cogs loaded by the client
+    * @type {Array[?Cogs]}
+    */
+    this.cogs = [];
     
    /**
-    * Cogs for the Client
-    * @type {?Array[Cog]}
+    * File directory, as of process path
+    * @type {String|URL}
     */
-    this.cogs = {};
+    this.path = process.cwd();
     
-    if (options.cogs) this.cogs = options.cogs;
+    if (options.path) this.path = process.cwd() + options.path;
     
    /**
-    * Commands folder directory
-    * @type {String}
+    * Automatic reloading for cogs
+    * Defaulted to true
+    * <warn> Any cogs outside of the options.path will not be loaded, and must be individually loaded.<\warn>
+    * @type {Boolean}
     */
-    if (options.commandDir) {
-    	this.commandDir = options.commandDir;
-    } else {
-    	this.commandDir = "./commands/";
+    this.automatic;
+    
+    if (!options.automatic) options.automatic = true;
+    
+    if (options.automatic) this.automatic = options.automatic;
+    
+    if (options.automatic == true) {
+        fs.readdir(this.path, { withFileTypes: true }, (err, files) => {
+            let nc, name;
+            if (err) return err;
+            files.forEach(f => {
+                if (!f.isFile()) return;
+                if (!f.name.includes(".js")) return;
+                name = f.name.slice(0, -3);
+                nc = new Cog(name, this.path);
+                this.cogs.push(nc);
+            })
+        })
     }
-    this.listFunctions = () => {
-    	console.log("+= Funcions           =+");
-    	            ""
-    	let funcs = [
-    	    'getCogs()',
-    	    'getCog()',
-    	    'addCog()'
-    	];
-    	let d;
-    	funcs.forEach(i => {
-    	    let d = " ",
-                o;
-    	    for (o = 0; o < Math.floor(25 - i.length - 4); ++o) {
-        	    d = " " + d;
-    	    }
-    	    console.log("| " + i + d + "|");
-    	});
-    	console.log("+=======================+")
-    }
+        
     
   }
   
-  // PUT ON PRIVATE FOR "BEING UTTERLY USELESS"
  /**
   * Cogs loaded in Client
   * @returns {?Cogs[]}
-  * @private
+  * @deprecated
   */
   get getCogs() {
    	return this.cogs;
    }
    
- /**
-  * Runs a command for a Cog
-  * @param {String} command name
-  * @param {Object} arguments
-  * @returns {Promise<Object>}
-  */
-  runCommand(name, args) {
-      let cog = this.cogs.filter(cog => c.commandNames.include(name))[0];
-      return new Promise(function (fulfill, reject) {
-          if (cog == undefined || cog == null || cog == []) return reject(Error("Command not found in Cogs"));
-          return fulfill(cog.commands[name](args));
-      });
-  }
+  /**
+   * Reload a cog
+   * @returns {?Array[Cogs]}
+   */
+   reloadCog(name, options = {}) {
+       if (this.cogs.filter(r => r.name == name) == []) return Error("Invalid cog name provided");
+       let oldCog = this.cogs.filter(r => r.name == name)[0];
+       let oldCogs = this.cogs.filter(r => r.name !== name);
+       let newCog = new Cog(name, oldCog.path, this, options);
+       this.cogs = oldCogs.push(newCog);
+       Console.log("Cog updated")
+       return this.cogs;
+   }  
    
   /**
-   * Gets a cog
-   * @param {String} Cog (file) name
-   * @returns {?Cog}
+   * Initialize the cog client to check for cogs.
+   * @returns {Client}
    */
-  fetchCog(cog_name) {
-  	if (this.cogs.get("name", cog_name)) {
-  	    return this.cogs.get("name", cog_name);
-      } else {
-      	if (this._events.error) {
-      	    this.emit("error", "Cog name provided is invalid");
-          } else {
-          	Error("Cog Name provided is invalid");
-              return;
-          }
-      }
-  }
-  
- /**
-  * Adds a cog to the Client
-  * @param {String} name of Cog
-  * @param {Object} options Cog options
-  * @returns {?Cog}
-  */
-  addCog(name, options) {
-      if (fs.existsSync(this.commandDir + "/" + name + ".js")) {
-          let nc;
-          if (options) nc = new Cog(this.commandDir + "/" + name + ".js", name, options, this);
-          if (!options) nc = new Cog(this.commandDir + "/" + name + ".js", name, {}, this);
-          this.cogs.push(nc);
-          return nc;
-      } else {
-      	if (this._events.error) {
-      	    this.emit("error", "Cog file does not exist");
-              return;
-          } else {
-          	Error("Cog file does not exist")
-          }
-      }
-  }
- /**
-  * Reload Cog
-  * <warn> This is purposely added to let the Cogs reload them into the Client</warn>
-  * @param {String} name of Cog
-  * @returns {?err|Client}
-  * @private
-  */
-  reloadCog(name, newCog) {
-      let cogs = Object.enteries(this.cogs).filter(c => c.name !== name);
-      let newCogs = Object.assign(cogs, newCog);
-      this.cogs = newCogs;
-  }
+   start() {
+       let cog;
+       fs.readdir(this.path, {
+           withFileTypes: true
+       }, (err, files) => {
+           if (err) return err;
+           files.forEach(file => {
+               if (!file.isFile()) return;
+               cog = new Cog(file.name, this.path, this)
+               this.cogs.push(cog);
+           })
+       });
+       /*if (this.automatic == true) {
+           client.addListener("cogUpdate", (newCog, oldCog) => {
+               this.cogs = this.cogs.filter(c => c.name !== oldCog.name).push(newCog);
+               Console.log("Cog updated")
+           });
+       }*/
+       return this;
+   }
+       
 
 }
-
-['error'].forEach((method) => {
-  Object.defineProperty(Client.prototype, `on${method}`, {
-    /**
-     * Return the listener of the event.
-     *p
-     * @return {(Function|undefined)} The event listener or `undefined`
-     * @public
-     */
-    get() {
-      const listeners = this.listeners(method);
-      for (let i = 0; i < listeners.length; i++) {
-        if (listeners[i]._listener) return listeners[i]._listener;
-      }
-
-      return undefined;
-    },
-    /**
-     * Add a listener for the event.
-     *
-     * @param {Function} listener The listener to add
-     * @public
-     */
-    set(listener) {
-      const listeners = this.listeners(method);
-      for (let i = 0; i < listeners.length; i++) {
-        //
-        // Remove only the listeners added via `addEventListener`.
-        //
-        if (listeners[i]._listener) this.removeListener(method, listeners[i]);
-      }
-      this.addEventListener(method, listener);
-    }
-  });
-});
-
-Client.prototype.addEventListener = addEventListener;
-Client.prototype.removeEventListener = removeEventListener;
 
 module.exports = Client;
